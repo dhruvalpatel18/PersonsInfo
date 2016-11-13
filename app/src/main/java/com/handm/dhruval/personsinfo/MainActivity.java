@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.handm.dhruval.personsinfo.helper.PersonInfoDialogFragment;
 import com.handm.dhruval.personsinfo.model.PersonInfo;
 
 import org.json.JSONArray;
@@ -115,6 +116,10 @@ public class MainActivity extends AppCompatActivity {
             this.infoList = infoList;
         }
 
+        public void update(PersonInfo personInfo) {
+            infoList.add(personInfo);
+        }
+
         @Override
         public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_list_item, parent, false);
@@ -137,7 +142,14 @@ public class MainActivity extends AppCompatActivity {
     private View.OnClickListener floatingActionButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            //Open DialogFragment
+            PersonInfoDialogFragment dialogFragment = new PersonInfoDialogFragment();
+            dialogFragment.show(getSupportFragmentManager(), "dialog");
         }
     };
+
+    public void showEnteredInfo(PersonInfo personInfo) {
+        adapter.update(personInfo);
+        adapter.notifyDataSetChanged();
+    }
+
 }
