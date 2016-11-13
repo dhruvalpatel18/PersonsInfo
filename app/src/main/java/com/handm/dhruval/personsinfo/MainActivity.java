@@ -1,5 +1,6 @@
 package com.handm.dhruval.personsinfo;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView.LayoutManager layoutManager;
     MyAdapter adapter;
 
+    FloatingActionButton floatingActionButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
         String json = getJsonFileData();
         adapter = new MyAdapter(getPersonInfoFromJson(json));
         recyclerView.setAdapter(adapter);
+
+        floatingActionButton = (FloatingActionButton)findViewById(R.id.floating_button);
+        floatingActionButton.setOnClickListener(floatingActionButtonListener);
     }
 
     private String getJsonFileData() {
@@ -127,4 +133,11 @@ public class MainActivity extends AppCompatActivity {
             return infoList.size();
         }
     }
+
+    private View.OnClickListener floatingActionButtonListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //Open DialogFragment
+        }
+    };
 }
