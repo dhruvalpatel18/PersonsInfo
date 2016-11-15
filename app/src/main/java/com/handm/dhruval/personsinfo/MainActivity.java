@@ -1,5 +1,6 @@
 package com.handm.dhruval.personsinfo;
 
+import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     MyAdapter adapter;
-
+    List<PersonInfo> infoList = new ArrayList<>();
+    PersonInfoDB database;
     FloatingActionButton floatingActionButton;
 
     @Override
@@ -48,12 +51,35 @@ public class MainActivity extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        String json = getJsonFileData();
-        adapter = new MyAdapter(getPersonInfoFromJson(json));
+        database = new PersonInfoDB(this);
+        infoList = getPersonInfoList();
+        adapter = new MyAdapter(infoList);
         recyclerView.setAdapter(adapter);
 
         floatingActionButton = (FloatingActionButton)findViewById(R.id.floating_button);
         floatingActionButton.setOnClickListener(floatingActionButtonListener);
+    }
+
+    private List<PersonInfo> getPersonInfoList() {
+        boolean isDatabaseExists = doesDatabaseExist(this, "person_info_db");
+        if (!isDatabaseExists) {
+            try {
+                JSONArray jArray = new JSONArray(getJsonFileData());
+
+                for (int i = 0; i < jArray.length(); i++) {
+                    JSONObject jsonObject = jArray.getJSONObject(i);
+                    database.onInsert(jsonObject.getString(FIRST_NAME), jsonObject.getString(LAST_NAME));
+                }
+            } catch (JSONException e) {
+                Log.e("MainActivity", "Error reading json data", e);
+            }
+        }
+        return database.getPersonInfoFromDB();
+    }
+
+    private static boolean doesDatabaseExist(Context context, String dbName) {
+        File dbFile = context.getDatabasePath(dbName);
+        return dbFile.exists();
     }
 
     private String getJsonFileData() {
@@ -77,27 +103,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return writer.toString();
-    }
-
-    private List<PersonInfo> getPersonInfoFromJson(String jsonData) {
-        List<PersonInfo> personInfoList = new ArrayList<>();
-        try {
-
-            JSONArray jArray = new JSONArray(jsonData);
-
-            for (int i = 0; i < jArray.length(); i++) {
-                JSONObject jsonObject = jArray.getJSONObject(i);
-
-                PersonInfo personInfo = new PersonInfo(jsonObject.getString(FIRST_NAME),
-                        jsonObject.getString(LAST_NAME));
-
-                personInfoList.add(personInfo);
-            }
-        } catch (JSONException e) {
-            Log.e("MainActivity", "Error reading json data", e);
-        }
-
-        return personInfoList;
     }
 
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
@@ -148,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     public void showEnteredInfo(PersonInfo personInfo) {
+        database.onInsert(personInfo.firstName, personInfo.lastName);
         adapter.update(personInfo);
         adapter.notifyDataSetChanged();
     }

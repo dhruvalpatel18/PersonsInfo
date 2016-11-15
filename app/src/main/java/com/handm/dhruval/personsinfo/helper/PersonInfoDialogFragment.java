@@ -41,10 +41,10 @@ public class PersonInfoDialogFragment extends DialogFragment {
     private View.OnClickListener addButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (firstName.getText().toString().isEmpty()) {
-                firstName.setError("Please enter first name");
-            } else if (lastName.getText().toString().isEmpty()) {
+            if (lastName.getText().toString().isEmpty()) {
                 lastName.setError("Please enter last name");
+            } else if (firstName.getText().toString().isEmpty()) {
+                firstName.setError("Please enter first name");
             } else {
                 String capitalizedFirstName = firstName.getText().toString().substring(0, 1).toUpperCase() + firstName.getText().toString().substring(1).toLowerCase();
                 String capitalizedLastName = lastName.getText().toString().substring(0, 1).toUpperCase() + lastName.getText().toString().substring(1).toLowerCase();
